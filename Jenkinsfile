@@ -35,5 +35,18 @@ sudo apt-get update
 sudo apt-get install docker-ce -y'''
       }
     }
+    stage('Build dotnet') {
+      environment {
+        DOCKER_TAG = ''
+        DOCKER_PASS = ''
+      }
+      steps {
+        sh '''dotnet publish -c Release
+sudo docker login -u kjackal -p ${DOCKER_PASS}
+sudo docker build -t kjackal/hello-dotnet:${DOCKER_TAG} .
+sudo docker push kjackal/hello-dotnet:${DOCKER_TAG}
+sudo /snap/bin/kubectl --kubeconfig=/var/tmp/config set image deployment/hello-dotnet hello-dotnet=kjackal/hello-dotnet:${DOCKER_TAG}'''
+      }
+    }
   }
 }
